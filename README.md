@@ -9,5 +9,5 @@ Probability of shuffling a string without repetition is 1/(n!)
 
 A = Atleast one success
 
-                        P(A) = 1-((n!-1)**m/(n!)**m)
+                          P(A) = 1-((n!-1)**m/(n!)**m)
 where m is the number of threads and n is the number of letters (without repetition)
