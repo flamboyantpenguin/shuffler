@@ -10,7 +10,7 @@ from json import dump
 from random import shuffle
 from time import sleep, time, ctime, strftime
 from threading import Thread
-from multiprocessing import SimpleQueue, Process
+from multiprocessing import SimpleQueue
 
 
 n = 20
