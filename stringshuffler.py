@@ -1,6 +1,6 @@
 #String Shuffler Experiment 3
-#Version 1.0
-#Last Updated: 15-03-2023
+#Version 1.5.0
+#Last Updated: 21-07-2023
 #DAWN/Experiments
 
 import os
@@ -9,11 +9,11 @@ import csv
 from json import dump
 from random import shuffle
 from time import sleep, time, ctime, strftime
-from threading import Thread, active_count
+from threading import Thread
 from multiprocessing import SimpleQueue
-from winsound import Beep, MessageBeep
 
 
+n = 20
 stime = 0
 sdir = '.'
 activity = []
@@ -69,9 +69,11 @@ def shuffler(ostring, string, queue):
             i+=1
             queue.put('\033[31mMismatch ({}/{})'.format(str(i),round(time()-stime,4)))
             shuffle(string)
+            if 'killcode' in globals():
+                return
         else:
             t = time()
-            Beep(2000, 200)
+            print('\a', end='')
             logger('Thread {} Success!'.format([i[1] for i in activity].index(queue)+1))
             while 1:
                 queue.put('\033[32mSuccess! ({}/{})'.format(str(i),round(t-stime,4)))
@@ -86,10 +88,17 @@ def shuffler(ostring, string, queue):
 
 def constructor(data, sdata):
     #Constructor
-    for i in range(20):
+    for i in range(n):
         q = SimpleQueue()
         t = Thread(target=shuffler, args=(data, sdata, q))
         activity.append([t, q])
+
+
+def clear():
+    if sys.platform == 'Windows':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 
 def initialise():
@@ -117,7 +126,7 @@ constructor(data, sdata)
 initialise()
 while 1:
     rdata = [i[1].get() for i in activity]
-    for i in range(0,20,5):
+    for i in range(0,n,5):
         print('\033[0mT{}:'.format(i+1), rdata[i], end='| ')
         print('\033[0mT{}:'.format(i+2), rdata[i+1], end='| ')
         print('\033[0mT{}:'.format(i+3), rdata[i+2], end='| ')
@@ -127,10 +136,10 @@ while 1:
     if int(time()-stime) > 60: print('\033[36mTime taken:', round((time()-stime)/60, 2), 'minutes\033[0m\n')
     else: print('\033[36mTime taken:', round(time()-stime, 2), 'seconds\033[0m\n')
     sleep(0.01)
-    os.system('cls')
+    clear()
     if all(['\033[32mSuccess' == i[:12] for i in rdata]):
         t = time()
-        MessageBeep()
+        print('\a', end='')
         killcode = 1
         tdata,fhit,lhit = optimize(rdata)
         print('\033[36m\nAll threads terminated successfully')
