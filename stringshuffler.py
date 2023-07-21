@@ -94,10 +94,10 @@ def constructor(data, sdata):
 
 
 def clear():
-    if sys.platform == 'Windows':
-        os.system('cls')
-    else:
+    if sys.platform == 'linux':
         os.system('clear')
+    else:
+        os.system('cls')
 
 
 def initialise():
