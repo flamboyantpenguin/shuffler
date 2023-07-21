@@ -144,6 +144,7 @@ while 1:
         t = time()
         print('\a', end='')
         killcode = 1
+        destroy()
         tdata,fhit,lhit = optimize(rdata)
         print('\033[36m\nAll threads terminated successfully')
         print('Display Time:', round((t-stime)/60, 2), 'minutes')
