@@ -59,11 +59,11 @@ def optimize(rdata):
     fhit = [t.index(min(t))+1, tdata[t.index(min(t))][1], tdata[t.index(min(t))][2]]
     lhit = [t.index(max(t))+1, tdata[t.index(max(t))][1], tdata[t.index(max(t))][2]]
     return tdata, fhit, lhit
-    
+
 
 def shuffler(ostring, string, queue):
     i=1
-    try: 
+    try:
         while ostring != string:
             i+=1
             queue.put('\033[31mMismatch ({}/{})'.format(str(i),round(time()-stime,4)))
@@ -83,7 +83,7 @@ def shuffler(ostring, string, queue):
             queue.put('\033[31m{}! (0/0)'.format(e))
             if 'killcode' in globals():
                 return
-        
+
 
 def constructor(data, sdata):
     #Constructor
