@@ -9,8 +9,7 @@ import csv
 from json import dump
 from random import shuffle
 from time import sleep, time, ctime, strftime
-from threading import Thread
-from multiprocessing import SimpleQueue
+from multiprocessing import SimpleQueue, Process
 
 
 n = 20
@@ -90,7 +89,7 @@ def constructor(data, sdata):
     #Constructor
     for i in range(n):
         q = SimpleQueue()
-        t = Thread(target=shuffler, args=(data, sdata, q))
+        t = Process(target=shuffler, args=(data, sdata, q))
         activity.append([t, q])
 
 
@@ -111,6 +110,10 @@ def initialise():
     for i in activity:
         i[0].start()
 
+
+def destroy():
+    for i in activity:
+        i[0].terminate()
 
 os.system('echo on')
 print('\033[33mString Shuffler Test 2')
