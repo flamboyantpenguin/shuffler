@@ -9,6 +9,7 @@ import csv
 from json import dump
 from random import shuffle
 from time import sleep, time, ctime, strftime
+from threading import Thread
 from multiprocessing import SimpleQueue, Process
 
 
@@ -68,28 +69,31 @@ def shuffler(ostring, string, queue):
             i+=1
             queue.put('\033[31mMismatch ({}/{})'.format(str(i),round(time()-stime,4)))
             shuffle(string)
-            if 'killcode' in globals():
-                return
+            if 'kill' in globals():
+                break
         else:
             t = time()
             print('\a', end='')
             logger('Thread {} Success!'.format([i[1] for i in activity].index(queue)+1))
             while 1:
                 queue.put('\033[32mSuccess! ({}/{})'.format(str(i),round(t-stime,4)))
-                if 'killcode' in globals():
-                    return
+                logger(str(globals()))
+                if 'kill' in globals():
+                    break
     except Exception as e:
        while 1:
             queue.put('\033[31m{}! (0/0)'.format(e))
-            if 'killcode' in globals():
-                return
+            if 'kill' in globals():
+                break
+    return
 
 
 def constructor(data, sdata):
     #Constructor
     for i in range(n):
         q = SimpleQueue()
-        t = Process(target=shuffler, args=(data, sdata, q))
+        t = Thread(target=shuffler, args=(data, sdata, q))
+        t.daemon = True
         activity.append([t, q])
 
 
@@ -111,10 +115,7 @@ def initialise():
         i[0].start()
 
 
-def destroy():
-    for i in activity:
-        i[0].terminate()
-
+#main
 os.system('echo on')
 print('\033[33mString Shuffler Test 2')
 print('Powered By DAWN/Experiments\033[0m\n')
@@ -143,8 +144,7 @@ while 1:
     if all(['\033[32mSuccess' == i[:12] for i in rdata]):
         t = time()
         print('\a', end='')
-        killcode = 1
-        destroy()
+        kill = True
         tdata,fhit,lhit = optimize(rdata)
         print('\033[36m\nAll threads terminated successfully')
         print('Display Time:', round((t-stime)/60, 2), 'minutes')
