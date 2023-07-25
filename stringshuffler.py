@@ -146,11 +146,12 @@ while 1:
     if int(time()-stime) > 60: print('\033[36mTime taken:', round((time()-stime)/60, 2), 'minutes\033[0m\n')
     else: print('\033[36mTime taken:', round(time()-stime, 2), 'seconds\033[0m\n')
     sleep(0.01)
+    print('\n\n\033[32mDAWN/Experiments')
     clear()
     if all(['\033[32mSuccess' == i[:12] for i in rdata]):
         t = time()
         print('\a', end='')
-        kill = True
+        killAllThreads = True
         tdata,fhit,lhit = optimize(rdata)
         print('\033[36m\nAll threads terminated successfully')
         print('Display Time:', round((t-stime)/60, 2), 'minutes')
