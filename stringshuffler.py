@@ -1,6 +1,6 @@
 #String Shuffler Experiment 3
 #Version 1.5.0
-#Last Updated: 21-07-2023
+#Last Updated: 25-07-2023
 #DAWN/Experiments
 
 import os
@@ -13,10 +13,12 @@ from threading import Thread
 from multiprocessing import SimpleQueue
 
 
+k = 0
 n = 20
 stime = 0
 sdir = '.'
 activity = []
+lIcon = ['|', '/', '-', '\\']
 about='''
 \033[36mProgram to experimentally calculate the probability of shuffling a string until the same string is obtained.
 
@@ -129,7 +131,11 @@ shuffle(sdata)
 constructor(data, sdata)
 initialise()
 while 1:
+    k = k+1 if k < 3 else 0
     rdata = [i[1].get() for i in activity]
+    print('\033[33mshuffler 1.5.0')
+    print('A Probability simulation program for obtaining the same combination after shuffling a string')
+    print('\nShuffling {}> [{}]\n\n\033[0m'.format(data, lIcon[k]))
     for i in range(0,n,5):
         print('\033[0mT{}:'.format(i+1), rdata[i], end='| ')
         print('\033[0mT{}:'.format(i+2), rdata[i+1], end='| ')
@@ -140,11 +146,12 @@ while 1:
     if int(time()-stime) > 60: print('\033[36mTime taken:', round((time()-stime)/60, 2), 'minutes\033[0m\n')
     else: print('\033[36mTime taken:', round(time()-stime, 2), 'seconds\033[0m\n')
     sleep(0.01)
+    print('\n\n\033[32mDAWN/Experiments')
     clear()
     if all(['\033[32mSuccess' == i[:12] for i in rdata]):
         t = time()
         print('\a', end='')
-        kill = True
+        killAllThreads = True
         tdata,fhit,lhit = optimize(rdata)
         print('\033[36m\nAll threads terminated successfully')
         print('Display Time:', round((t-stime)/60, 2), 'minutes')
