@@ -59,6 +59,7 @@ def optimize(rdata):
 
 
 def shuffler(ostring, string, queue):
+    global hit
     i=1
     try:
         while ostring != string:
@@ -68,6 +69,7 @@ def shuffler(ostring, string, queue):
             if killAllThreads: break
         else:
             t = time()
+            hit.append('Yes')
             print('\a', end='')
             logger('Thread {} Success!'.format([i[1] for i in activity].index(queue)+1))
             while 1:
@@ -98,10 +100,8 @@ def checkHit():
 
 
 def clear():
-    if sys.platform == 'linux':
-        os.system('clear')
-    else:
-        os.system('cls')
+    if sys.platform == 'linux': os.system('clear')
+    else: os.system('cls')
 
 
 def initialise(e):
@@ -111,8 +111,7 @@ def initialise(e):
     if not(os.path.exists('./Records')): os.mkdir('Records')
     os.mkdir(sdir)
     stime = time()
-    for i in activity:
-        i[0].start()
+    for i in activity: i[0].start()
     if e:
         t = Thread(target=checkHit)
         t.daemon = True
