@@ -13,23 +13,17 @@ from threading import Thread
 from multiprocessing import SimpleQueue
 
 
-k = 0
+k, stime = 0,0
 n = 20
-stime = 0
 sdir = '.'
+endOnAllHit = False
 activity = []
+killAllThreads = False
 lIcon = ['|', '/', '-', '\\']
+hit = []
 about='''
-\033[36mProgram to experimentally calculate the probability of shuffling a string until the same string is obtained.
-
-Probability of shuffling a string without repetition is 1/(n!)
-
------Probability of shuffling a string by m threads at the same time-----
-
-A -> Atleast one success
-
-\t\tP(A) = 1-((n!-1)**m/(n!)**m)
-where m is the number of threads and n is the number of letters (without repetition)\033[0m\n
+\033[36mProgram to experimentally calculate the probability of shuffling a string until the same string is obtained.\033[0m
+\033[31mNote: Though the loop in the threads iterates quickly, fetching data from queue and diplaying it takes time. Because of this, the program remains in shuffling phase even after the internal threads are terminated.\033[0m\n
 '''
 
 
@@ -71,22 +65,18 @@ def shuffler(ostring, string, queue):
             i+=1
             queue.put('\033[31mMismatch ({}/{})'.format(str(i),round(time()-stime,4)))
             shuffle(string)
-            if 'kill' in globals():
-                break
+            if killAllThreads: break
         else:
             t = time()
             print('\a', end='')
             logger('Thread {} Success!'.format([i[1] for i in activity].index(queue)+1))
             while 1:
                 queue.put('\033[32mSuccess! ({}/{})'.format(str(i),round(t-stime,4)))
-                logger(str(globals()))
-                if 'kill' in globals():
-                    break
+                if killAllThreads: break
     except Exception as e:
        while 1:
             queue.put('\033[31m{}! (0/0)'.format(e))
-            if 'kill' in globals():
-                break
+            if killAllThreads: break
     return
 
 
@@ -99,6 +89,14 @@ def constructor(data, sdata):
         activity.append([t, q])
 
 
+def checkHit():
+    global killAllThreads
+    while 1:
+        if len(hit) == n:
+            killAllThreads = True
+            break
+
+
 def clear():
     if sys.platform == 'linux':
         os.system('clear')
@@ -106,7 +104,7 @@ def clear():
         os.system('cls')
 
 
-def initialise():
+def initialise(e):
     global stime
     global sdir
     sdir+=strftime('/Records/%Y%m%d%H%M%S')
@@ -115,6 +113,10 @@ def initialise():
     stime = time()
     for i in activity:
         i[0].start()
+    if e:
+        t = Thread(target=checkHit)
+        t.daemon = True
+        t.start()
 
 
 #main
@@ -125,12 +127,13 @@ print(ctime())
 print(about)
 data = list(input('Enter string: '))
 n = int(input('Number of threads: '))
+endOnAllHit = True if input('End program on all thread hit? (Y/N): ')[0].upper() == 'Y' else False
 print(data, '\n')
 sleep(2)
 sdata = data.copy()
 shuffle(sdata)
 constructor(data, sdata)
-initialise()
+initialise(endOnAllHit)
 while 1:
     k = k+1 if k < 3 else 0
     rdata = [i[1].get() for i in activity]
@@ -145,7 +148,7 @@ while 1:
     sleep(0.01)
     print('\n\n\033[32mDAWN/Experiments')
     clear()
-    if all(['\033[32mSuccess' == i[:12] for i in rdata]):
+    if all(['\033[32mSuccess' == i[:12] for i in rdata]) or killAllThreads == True:
         t = time()
         print('\a', end='')
         killAllThreads = True
