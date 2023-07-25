@@ -8,19 +8,20 @@ import sys
 import csv
 from json import dump
 from random import shuffle
-from time import sleep, time, ctime, strftime
 from threading import Thread
 from multiprocessing import SimpleQueue
+from time import sleep, time, ctime, strftime
 
 
-k, stime = 0,0
 n = 20
 sdir = '.'
+k, stime = 0,0
 endOnAllHit = False
-activity = []
-killAllThreads = False
-lIcon = ['|', '/', '-', '\\']
-hit = []
+killAllThreads = False #Do not change before program execution
+activity, hit = [], []
+lIcon = ['|', '/', '-', '\\'] #Loading Animation Characters
+
+#Program Description 
 about='''
 \033[36mProgram to experimentally calculate the probability of shuffling a string until the same string is obtained.\033[0m
 \033[31mNote: Though the loop in the threads iterates quickly, fetching data from queue and diplaying it takes time. Because of this, the program remains in shuffling phase even after the internal threads are terminated.\033[0m\n
@@ -28,6 +29,7 @@ about='''
 
 
 def logger(message):
+    #Logger function
     with open(sdir+'/log.txt', 'a') as log:
         log.write(strftime('%Y-%m-%d/%H:%M:%S> '))
         log.write(message)
@@ -35,12 +37,14 @@ def logger(message):
 
 
 def generateReport(f, l, t):
+    #Exports Report Data as JSON
     d = {'Record':sdir.split('/')[1], 'String':data, 'First Hit':[f], 'Last Hit':[l], 'Display Time':t}
     with open(sdir+'/data.json', 'w') as f:
         dump(d, f, indent=2)
 
 
 def exportData(data):
+    #Exports Report Data as CSV
     header = ['Thread', 'Iterations', 'Time']
     with open(sdir+'/data.csv', 'w', newline='') as f:
         writer = csv.writer(f, delimiter=',')
@@ -49,6 +53,7 @@ def exportData(data):
 
 
 def optimize(rdata):
+    #Optimises Queue Data for Report Generation
     tdata, t = [],[]
     for i in rdata:
         tdata.append([rdata.index(i)+1,int(i.split('/')[0][15:]), float(i.split('/')[1][:-1])])
@@ -59,6 +64,7 @@ def optimize(rdata):
 
 
 def shuffler(ostring, string, queue):
+    #Shuffler
     global hit
     i=1
     try:
@@ -83,7 +89,7 @@ def shuffler(ostring, string, queue):
 
 
 def constructor(data, sdata):
-    #Constructor
+    #Thread Constructor
     for i in range(n):
         q = SimpleQueue()
         t = Thread(target=shuffler, args=(data, sdata, q))
@@ -92,6 +98,7 @@ def constructor(data, sdata):
 
 
 def checkHit():
+    #Function to Check whether All Thread hit. Applicable only if EndOnAllHit = True
     global killAllThreads
     while 1:
         if len(hit) == n:
@@ -100,11 +107,13 @@ def checkHit():
 
 
 def clear():
+    #Clears console output
     if sys.platform == 'linux': os.system('clear')
     else: os.system('cls')
 
 
-def initialise(e):
+def initialise(endOnAllHit):
+    #Function for Initialising Threads and Generating Directories for Reports
     global stime
     global sdir
     sdir+=strftime('/Records/%Y%m%d%H%M%S')
@@ -112,18 +121,22 @@ def initialise(e):
     os.mkdir(sdir)
     stime = time()
     for i in activity: i[0].start()
-    if e:
+    if endOnAllHit:
         t = Thread(target=checkHit)
         t.daemon = True
         t.start()
 
 
 #main
-os.system('echo on')
+if sys.platform != 'linux': os.system('echo on') #To enable ASCII codes in Windows
+
+#Introduction
 print('\033[33mString Shuffler Test 2')
 print('Powered By DAWN/Experiments\033[0m\n')
 print(ctime())
 print(about)
+
+#User Input
 data = list(input('Enter string: '))
 n = int(input('Number of threads: '))
 endOnAllHit = True if input('End program on all thread hit? (Y/N): ')[0].upper() == 'Y' else False
@@ -135,23 +148,36 @@ constructor(data, sdata)
 initialise(endOnAllHit)
 while 1:
     k = k+1 if k < 3 else 0
+    #Obtaining Thread Status from Queues
     rdata = [i[1].get() for i in activity]
+
+    #Header
     print('\033[33mshuffler 1.5.0')
     print('A Probability simulation program for obtaining the same combination after shuffling a string')
     print('\nShuffling {}> [{}]\n\n\033[0m'.format(data, lIcon[k]))
+
+    #Thread Status
     for i in range(0,n,1):
-        if i % 5 == 0 and i != 0 and i != 1: print('\n')
+        if i % 5 == 0 and i != 0: print('\n')
         print('\033[0mT{}:'.format(i+1), rdata[i], end='| ', flush=True)
+
+    #Display Time
     if int(time()-stime) > 60: print('\n\n\033[36mTime taken:', round((time()-stime)/60, 2), 'minutes\033[0m\n')
     else: print('\n\n\033[36mTime taken:', round(time()-stime, 2), 'seconds\033[0m\n')
     sleep(0.01)
+
+    #Footer
     print('\n\n\033[32mDAWN/Experiments')
     clear()
+
+    #Shifting to report phase on All Thread Hit or 'Success' flag from Queues
     if all(['\033[32mSuccess' == i[:12] for i in rdata]) or killAllThreads == True:
         t = time()
         print('\a', end='')
         killAllThreads = True
         tdata,fhit,lhit = optimize(rdata)
+
+        #HitReport
         print('\033[36m\nAll threads terminated successfully')
         print('Display Time:', round((t-stime)/60, 2), 'minutes')
         print('\n-----First Hit-----')
