@@ -24,7 +24,7 @@ lIcon = ['|', '/', '-', '\\'] #Loading Animation Characters
 #Program Description 
 about='''
 \033[36mProgram to experimentally calculate the probability of shuffling a string until the same string is obtained.\033[0m
-\033[31mNote: Though the loop in the threads iterates quickly, fetching data from queue and diplaying it takes time. Because of this, the program remains in shuffling phase even after the internal threads are terminated.\033[0m\n
+\033[31mNote: There will be a time lag between Displaying Thread status and thread hit. To avoid this, allow endOnAllHit\033[0m\n
 '''
 
 
