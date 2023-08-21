@@ -1,6 +1,6 @@
 #String Shuffler Experiment 3
-#Version 1.5.0
-#Last Updated: 25-07-2023
+#Version 2.0.0
+#Last Updated: 21-08-2023
 #DAWN/Experiments
 
 import os
@@ -131,7 +131,7 @@ def initialise(endOnAllHit):
 if sys.platform != 'linux': os.system('echo on') #To enable ASCII codes in Windows
 
 #Introduction
-print('\033[33mString Shuffler Test 2')
+print('\033[33mshuffler 2.0.0')
 print('Powered By DAWN/Experiments\033[0m\n')
 print(ctime())
 print(about)
@@ -150,9 +150,10 @@ while 1:
     k = k+1 if k < 3 else 0
     #Obtaining Thread Status from Queues
     rdata = [i[1].get() for i in activity]
+    clear()
 
     #Header
-    print('\033[33mshuffler 1.5.0')
+    print('\033[33mshuffler 2.0.0')
     print('A Probability simulation program for obtaining the same combination after shuffling a string')
     print('\nShuffling {}> [{}]\n\n\033[0m'.format(data, lIcon[k]))
 
@@ -168,10 +169,11 @@ while 1:
 
     #Footer
     print('\n\n\033[32mDAWN/Experiments')
-    clear()
+    
 
     #Shifting to report phase on All Thread Hit or 'Success' flag from Queues
     if all(['\033[32mSuccess' == i[:12] for i in rdata]) or killAllThreads == True:
+        clear()
         t = time()
         print('\a', end='')
         killAllThreads = True
